@@ -4,7 +4,7 @@ import processing.core.PApplet;
 
 public class MainCliente extends PApplet {
 
-	Logica logica;
+	Logica log;
 
 	public static void main(String[] args) {
 		PApplet.main("cliente.MainCliente");
@@ -22,13 +22,19 @@ public class MainCliente extends PApplet {
 		noStroke();
 		smooth();
 		textAlign(CENTER);
-		logica = new Logica(this);
+		log = new Logica(this);
 	}
 
 	@Override
 	public void draw() {
 		background(360);
-		logica.pintar();
+		log.pintar();
 	}
 
+	
+	@Override
+	public void mouseClicked() {
+		// TODO Auto-generated method stub
+		log.validar();
+	}
 }

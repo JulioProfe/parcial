@@ -2,11 +2,11 @@ package servidor;
 
 public class Main {
 
-	private static Logica logica;
+	private static AtencionCliente cliente;
 
 	public static void main(String[] args) {
-		logica = new Logica();
-		new Thread(logica).start();
+		cliente = new AtencionCliente();
+		new Thread(cliente).start();
 	}
 
 	

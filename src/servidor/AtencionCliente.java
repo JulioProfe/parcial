@@ -10,18 +10,20 @@ import java.util.Iterator;
 import java.util.Observable;
 import java.util.Observer;
 
-public class Logica implements Observer, Runnable {
+import processing.core.PApplet;
+
+public class AtencionCliente implements Observer, Runnable {
 
 	private final int PORT = 5000;
 
 	private ServerSocket socketServidor;
+	private ControlXMLMensajes cxmlMensajes;
 
 	private boolean conectado;
-	private boolean moviendo;
 
 	private ArrayList<Comunicacion> clientes = new ArrayList<>();
 
-	public Logica() {
+	public AtencionCliente() {
 
 		try {
 			socketServidor = new ServerSocket(PORT);
@@ -29,26 +31,21 @@ public class Logica implements Observer, Runnable {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		moviendo = true;
+	}
+	public AtencionCliente(PApplet app){
+		cxmlMensajes = new ControlXMLMensajes(app);
 	}
 
 	@Override
 	public void run() {
 		while (conectado) {
 			try {
-
-				// Esperar a que un cliente se conecte
 				Socket s = socketServidor.accept();
 
 				Comunicacion com = new Comunicacion(s, clientes.size());
-
-				// Agregar el gestor como observador
 				com.addObserver(this);
-
-				// Comenzar el hilo de ejecución del contrlador
 				new Thread(com).start();
 
-				// Agregar a la colección de clientes
 				clientes.add(com);
 				Thread.sleep(100);
 			} catch (InterruptedException e) {
@@ -76,21 +73,21 @@ public class Logica implements Observer, Runnable {
 
 			if (mensaje.contains("values")) {
 				controladorCliente.enviarMensaje("id:" + clientes.size());
-				//controladorCliente.enviarMensaje("color:" + (int) (Math.random() * 360));
 				reenviarMensaje("mas", controladorCliente);
 			}
 
-			if (moviendo) {
-				controladorCliente.enviarMensaje("muevase");
-				moviendo = false;
-			}
-			if (mensaje.contains("acabe")) {
+			if (mensaje.contains("envio")) {
 				if (controladorCliente.getId() == clientes.size()-1) {
-					clientes.get(0).enviarMensaje("muevase");
+					clientes.get(0).enviarMensaje("llego");
 				} else {
-					clientes.get(controladorCliente.getId() + 1).enviarMensaje("muevase");
+					clientes.get(controladorCliente.getId() + 1).enviarMensaje("llego");
+				}
+				
+				for (Iterator<Comunicacion> iterator = clientes.iterator(); iterator.hasNext();) {
+					cxmlMensajes.agregarMensaje(controladorCliente.getId(), controladorCliente.getId());
 				}
 			}
+			
 		}
 
 	}
